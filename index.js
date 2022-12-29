@@ -25,6 +25,13 @@ async function run () {
             const cursor = await myTaskCollections.find().toArray();
             res.send(cursor)
         })
+
+        app.get('/completedTask', async(req, res) => {
+            const query = {}
+            const cursor = await myTaskCollections.find({completed: true}).toArray();
+            res.send(cursor)
+            
+        })
         app.post('/my-task', async(req, res) => {
             const task = req.body;
             const result = await myTaskCollections.insertOne(task);
@@ -42,9 +49,27 @@ async function run () {
                 }
             }
             const result = await myTaskCollections.updateOne(filter, updatedDoc, options);
+            res.send(result)                  
+        })
+
+        app.patch('/completedTask/:id', async(req, res) => {
+            const id = req.params.id;
+            const filter = { _id: ObjectId(id)}
+            const updatedDoc = {
+                $set: {
+                    completed: true
+                }
+            }
+            const result = await myTaskCollections.updateOne(filter, updatedDoc)
             res.send(result)
-            
-            
+        })
+
+
+        app.delete('/deleteTask/:id', async(req, res) => {
+            const id = req.params.id
+            const query = { _id: ObjectId(id)}
+            const result = await myTaskCollections.deleteOne(query);
+            res.send(result)
         })
     }
     finally{
